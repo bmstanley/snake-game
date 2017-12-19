@@ -1,13 +1,13 @@
 const canvas = document.getElementById("snake");
 const context = canvas.getContext("2d");
 
-const box = 32;
+const box_size = 32;
 
 const ground = new Image();
 ground.src="assets/img/ground.png";
 
-const foodImg = new Image();
-foodImg.src = "assets/img/food.png";
+const food_image = new Image();
+food_image.src = "assets/img/food.png";
 
 const dead = new Audio();
 const eat = new Audio();
@@ -23,40 +23,37 @@ left.src = "assets/audio/left.mp3";
 right.src = "assets/audio/right.mp3";
 down.src = "assets/audio/down.mp3";
 
+// To Do: replace with set() to see what happens
 let snake = [];
 snake[0] = {
-    x : 9 * box,
-    y : 9 * box
+    x : 9 * box_size,
+    y : 9 * box_size
 }
 
-let food = {
-    x : Math.floor(Math.random()*17+1) * box,
-    y : Math.floor(Math.random()*15+3) * box,
-}
-
+let food = createFood();
 let score = 0;
+let direction;
 
-let d;
+document.addEventListener("keydown", setDirection);
 
-document.addEventListener("keydown", direction);
-
-function direction(event) {
-    if (event.keyCode == 37 && d != "RIGHT") {
+function setDirection(event) {
+    if (event.keyCode == 37 && direction != "RIGHT") {
         left.play();
-        d = "LEFT";
-    } else if (event.keyCode == 38 && d != "DOWN") {
+        direction = "LEFT";
+    } else if (event.keyCode == 38 && direction != "DOWN") {
         up.play();
-        d = "UP";
-    } else if (event.keyCode == 39 && d != "LEFT") {
+        direction = "UP";
+    } else if (event.keyCode == 39 && direction != "LEFT") {
         right.play();
-        d = "RIGHT";
-    } else if (event.keyCode == 40 && d != "UP") {
+        direction = "RIGHT";
+    } else if (event.keyCode == 40 && direction != "UP") {
         down.play();
-        d = "DOWN";
+        direction = "DOWN";
     }
 }
 
 function collision(head, array) {
+    // To Do: if array == set(), maybe use something like set().has(), idk
     for (let i = 0; i < array.length; i++) {
         if (head.x == array[i].x && head.y == array[i].y) {
             return true;
@@ -69,32 +66,29 @@ function draw() {
     context.drawImage(ground, 0, 0);
     for (let i = 0; i < snake.length; i++) {
         context.fillStyle = (i == 0) ? "green" : "white";
-        context.fillRect(snake[i].x, snake[i].y, box, box);
+        context.fillRect(snake[i].x, snake[i].y, box_size, box_size);
 
         context.strokeStyle = "red";
-        context.strokeRect(snake[i].x, snake[i].y, box, box);
+        context.strokeRect(snake[i].x, snake[i].y, box_size, box_size);
     }
 
-    context.drawImage(foodImg, food.x, food.y);
+    context.drawImage(food_image, food.x, food.y);
 
     // capture the old head position
     let snakeX = snake[0].x;
     let snakeY = snake[0].y;
 
     // which direction
-    if (d == "LEFT") snakeX -= box;
-    if (d == "UP") snakeY -= box;
-    if (d == "RIGHT") snakeX += box;
-    if (d == "DOWN") snakeY += box;
+    if (direction == "LEFT") snakeX -= box_size;
+    if (direction == "UP") snakeY -= box_size;
+    if (direction == "RIGHT") snakeX += box_size;
+    if (direction == "DOWN") snakeY += box_size;
 
     // if the snake eats the food
     if (snakeX == food.x && snakeY == food.y) {
         score++;
         eat.play();
-        food = {
-            x : Math.floor(Math.random()*17+1) * box,
-            y : Math.floor(Math.random()*15+3) * box,
-        }
+        food = createFood();
     } else {
         // remove the tail
         snake.pop();
@@ -107,7 +101,7 @@ function draw() {
     }
 
     // game over
-    if (snakeX < box || snakeX > 17 * box || snakeY < 3 * box || snakeY > 17 * box || collision(newHead, snake)) {
+    if (snakeX < box_size || snakeX > 17 * box_size || snakeY < 3 * box_size || snakeY > 17 * box_size || collision(newHead, snake)) {
         clearInterval(game);
         dead.play();
     }
@@ -116,7 +110,14 @@ function draw() {
 
     context.fillStyle = "white";
     context.font = "45px Open Sans";
-    context.fillText(score, 2 * box, 1.6 * box);
+    context.fillText(score, 2 * box_size, 1.6 * box_size);
+}
+
+function createFood() {
+    return {
+        x : Math.floor(Math.random()*17+1) * box_size,
+        y : Math.floor(Math.random()*15+3) * box_size,
+    }
 }
 
 // call the draw function every 100 ms

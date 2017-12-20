@@ -3,7 +3,7 @@ Simple Javascript Snake game, originally created by following the tutorial found
 
 ## But wait, there's more!
 Upon completion of the tutorial, I plan on adding the following enhancements:
-- refactor code for better organization and readability (in-progress)
+- refactor code for better organization and readability (complete)
 - ensure that the food does not spawn on the snake
 - add ability to restart the game without refreshing the page
 - add ability to choose difficulty level before staring the game

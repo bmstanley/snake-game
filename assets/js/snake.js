@@ -37,9 +37,14 @@ let food = createFood();
 let score = 0;
 let direction;
 
+let game_running = true;
+
 document.addEventListener("keydown", setDirection);
 
 function setDirection(event) {
+    if (game_running === false) {
+        return false;
+    }
     if (event.keyCode == 37 && direction != "RIGHT") {
         left_audio.play();
         direction = "LEFT";
@@ -55,9 +60,9 @@ function setDirection(event) {
     }
 }
 
-function collision(head, array) {
-    for (let i = 0, len = array.length; i < len; i++) {
-        if (head.x == array[i].x && head.y == array[i].y) {
+function collision(needle, haystack) {
+    for (let i = 0, len = haystack.length; i < len; i++) {
+        if (needle.x == haystack[i].x && needle.y == haystack[i].y) {
             return true;
         }
     }
@@ -106,6 +111,7 @@ function draw() {
     if (snakeX < box_size || snakeX > playable_area_width * box_size || snakeY < top_offset * box_size || snakeY > playable_area_width * box_size || collision(newHead, snake)) {
         clearInterval(game);
         dead_audio.play();
+        game_running = false;
     }
 
     snake.unshift(newHead);
@@ -117,10 +123,14 @@ function draw() {
 }
 
 function createFood() {
-    return {
+    let potential = {
         x : Math.floor(Math.random() * playable_area_width + left_offset) * box_size,
         y : Math.floor(Math.random() * playable_area_height + top_offset) * box_size,
     }
+    if (collision(potential, snake)) {
+        createFood();
+    }
+    return potential;
 }
 
 // call the draw function every 100 ms
